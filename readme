@@ -1,0 +1,171 @@
+Multi-Tenancy Node.js + MongoDB Example
+
+This project demonstrates 3 multi-tenancy strategies in a Node.js + Express API using MongoDB and Mongoose.
+
+Features
+
+Shared Collection → One collection for all tenants (tagged with tenantId).
+
+Per Collection → Separate collection for each tenant.
+
+Per Database → Separate database for each tenant.
+
+Uses x-tenant-id request header for tenant identification.
+
+MongoDB connection management for multi-tenancy.
+
+📂 Folder Structure
+multi-tenancy-demo/
+│
+├── config/
+│   └── db.js               # Main DB connection
+│
+├── models/
+│   ├── task.shared.js      # Shared collection schema
+│   ├── task.perCollection.js # Per collection schema
+│
+├── services/
+│   └── tenantDb.js         # Per-DB connection manager
+│
+├── routes/
+│   └── tasks.js            # All task routes
+│
+├── app.js                  # Express app setup
+├── .env                    # Environment variables
+├── package.json
+
+⚙️ Setup
+1. Clone & Install
+git clone <your-repo-url>
+cd multi-tenancy-demo
+npm install
+
+2. Environment Variables
+
+Create .env file:
+
+MONGO_URI_MAIN=mongodb://localhost:27017/main_db
+MONGO_URI_BASE=mongodb://localhost:27017
+PORT=3000
+
+3. Start MongoDB
+
+Make sure MongoDB is running locally:
+
+mongod
+
+4. Start Server
+node app.js
+
+
+You should see:
+
+✅ Connected to Main MongoDB
+🚀 Server running on port 3000
+
+🛠 API Documentation
+Headers
+Key	Value	Required
+Content-Type	application/json	✅
+x-tenant-id	tenantA / tenantB	✅
+1️⃣ Shared Collection
+
+POST /tasks/shared — Add a task
+
+// Request Body
+{
+  "title": "Task for Tenant A"
+}
+
+
+Response
+
+{
+  "_id": "64f1a4d8cbd1234567890",
+  "tenantId": "tenantA",
+  "title": "Task for Tenant A",
+  "__v": 0
+}
+
+
+GET /tasks/shared — Get all tasks for tenant
+Response
+
+[
+  {
+    "_id": "64f1a4d8cbd1234567890",
+    "tenantId": "tenantA",
+    "title": "Task for Tenant A",
+    "__v": 0
+  }
+]
+
+2️⃣ Per Collection
+
+POST /tasks/per-collection
+
+{
+  "title": "Task for Tenant B"
+}
+
+
+GET /tasks/per-collection
+
+Returns only the tenant’s collection data.
+
+3️⃣ Per Database
+
+POST /tasks/per-db
+
+{
+  "title": "Task for Tenant C"
+}
+
+
+GET /tasks/per-db
+
+Returns data from the tenant’s dedicated database.
+
+🧪 Testing
+Using Postman
+
+Open Postman.
+
+Create new request:
+
+Method: POST
+
+URL: http://localhost:3000/tasks/shared
+
+Headers:
+
+Content-Type: application/json
+x-tenant-id: tenantA
+
+
+Body (raw JSON):
+
+{
+  "title": "Task for Tenant A"
+}
+
+
+Click Send.
+
+Change x-tenant-id to test multiple tenants.
+
+Using MongoDB Compass
+
+Connect to: mongodb://localhost:27017
+
+Check:
+
+main_db → for shared & per-collection
+
+tenantA_db, **tenantB_db→ forper-db`
+
+📌 Multi-Tenancy Strategy Comparison
+Strategy	Pros	Cons
+Shared Collection	Simple, single DB	Must filter tenantId always
+Per Collection	Data isolation in same DB	Many collections for many tenants
+Per Database	Strong isolation, easy backup	More connections to manage
