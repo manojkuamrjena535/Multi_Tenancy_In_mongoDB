@@ -13,3 +13,6 @@ const getTenantDb = (tenantId) => {
 };
 
 module.exports = getTenantDb;
+
+
+//in this model we make separate databases and collection for each tenant

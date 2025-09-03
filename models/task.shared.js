@@ -6,3 +6,6 @@ const mongoose = require('mongoose');
  });
 
  module.exports = mongoose.model('TaskShared', taskSharedSchema);
+
+ 
+//in this model we make use same collection for each tenant

@@ -9,3 +9,5 @@ const getTaskModelForTenant = (tenantId)=>{
     return mongoose.model(collectionName,taskSchema);
 };
 module.exports = getTaskModelForTenant
+
+//in this model we make separate collection for each tenant
